@@ -1,0 +1,67 @@
+<html>
+  <head>
+    
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawLineChart);
+
+      function drawChart() {
+       //data = new google.visualization.DataTable();
+       //data.addColumn('School Type', 'Count');
+       var data = new google.visualization.DataTable();
+       data.addColumn('string', 'School Type');
+       data.addColumn('number', 'Count');
+        let url = "https://data.cityofchicago.org/resource/dw27-rash.json?$SELECT=school_type,count(school_type)&$GROUP=school_type ";
+
+        fetch (url)
+          .then ( (response) => {
+            return response.json();
+          })
+          .then ( (json) => {
+            //console.log(json)
+            json.forEach (item => {
+               data.addRow([item.school_type, parseInt(item.count_school_type)])
+           });
+          var options = {title: 'City of Chicago School Type'};
+
+         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(data, options);
+        })
+      }
+
+      function drawLineChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', 'sum_total_doses_cumulative');
+        let url = "https://data.cityofchicago.org/resource/553k-3xzc.json?$SELECT=date,sum(total_doses_cumulative)&$GROUP=date&$ORDER=date";
+        fetch (url)
+          .then ( (response) => {
+            return response.json();
+          })
+          .then ( (json) => {
+            //console.log(json)
+            json.forEach (item => {
+               data.addRow([item.date, parseInt(item.sum_total_doses_cumulative)])
+           });
+        
+           var options = {
+          title: 'City of Chicagocumulative doses',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+         var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+        })
+      }
+       
+
+    </script>
+  </head>
+  <body>
+    <div id="piechart" style="width: 900px; height: 500px;"></div>
+    <div id="curve_chart" style="width: 900px; height: 500px"></div>
+  </body>
+</html>
